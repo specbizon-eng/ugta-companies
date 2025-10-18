@@ -52,6 +52,30 @@ model User {
   ledgerEntries BalanceLedger[] @relation("UserToLedger")
 }
 
+model MarketCategory {
+  id    String @id @default(cuid())
+  name  String @unique
+  order Int    @default(0)
+  items MarketItem[]
+}
+
+enum ListingStatus { PENDING APPROVED REJECTED }
+
+model MarketItem {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields:[userId],references:[id])
+  categoryId  String
+  category    MarketCategory @relation(fields:[categoryId],references:[id])
+  title       String
+  description String
+  priceCents  Int?     // опціонально
+  contact     String?  // Discord/Telegram
+  photos      Json     // масив URLів
+  status      ListingStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+}
+
 model Contract {
   id          String          @id @default(cuid())
   userId      String
