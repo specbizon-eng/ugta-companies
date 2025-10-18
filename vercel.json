@@ -1,1 +1,3 @@
-{ "buildCommand": "pnpm dlx prisma migrate deploy && node prisma/seed.cjs && pnpm build" }
+{
+  "buildCommand": "npm run build"
+}
