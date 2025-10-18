@@ -47,6 +47,9 @@ model User {
 
   contracts     Contract[]
   bookings      Booking[]
+
+  // ✅ зворотній зв’язок до BalanceLedger
+  ledgerEntries BalanceLedger[] @relation("UserToLedger")
 }
 
 model Contract {
@@ -91,7 +94,10 @@ model Booking {
 model BalanceLedger {
   id         String   @id @default(cuid())
   userId     String
-  user       User     @relation(fields: [userId], references: [id])
+
+  // ✅ явна назва зв’язку
+  user       User     @relation("UserToLedger", fields: [userId], references: [id])
+
   deltaCents Int
   note       String
   createdAt  DateTime @default(now())
