@@ -1,0 +1,3 @@
+
+import { NextResponse } from "next/server"; import { prisma } from "@/lib/db"; import { hashPassword, signSession, setSessionCookie } from "@/lib/auth";
+export async function POST(req:Request){ const {email,password,name}=await req.json(); if(!email||!password||!name) return NextResponse.json({error:'Bad request'},{status:400}); const exists=await prisma.user.findUnique({where:{email}}); if(exists) return NextResponse.json({error:'Email in use'},{status:400}); const user=await prisma.user.create({data:{email,name,passwordHash:await hashPassword(password)}}); const token=signSession({id:user.id,role:user.role,name:user.name}); await setSessionCookie(token); return NextResponse.json({ok:true}); }
