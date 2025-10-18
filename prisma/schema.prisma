@@ -52,30 +52,6 @@ model User {
   ledgerEntries BalanceLedger[] @relation("UserToLedger")
 }
 
-model MarketCategory {
-  id    String @id @default(cuid())
-  name  String @unique
-  order Int    @default(0)
-  items MarketItem[]
-}
-
-enum ListingStatus { PENDING APPROVED REJECTED }
-
-model MarketItem {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields:[userId],references:[id])
-  categoryId  String
-  category    MarketCategory @relation(fields:[categoryId],references:[id])
-  title       String
-  description String
-  priceCents  Int?     // опціонально
-  contact     String?  // Discord/Telegram
-  photos      Json     // масив URLів
-  status      ListingStatus @default(PENDING)
-  createdAt   DateTime @default(now())
-}
-
 model Contract {
   id          String          @id @default(cuid())
   userId      String
@@ -135,4 +111,107 @@ model ChatModeration {
   reason    String?
   expiresAt DateTime?
   createdAt DateTime     @default(now())
+}
+
+model MarketCategory {
+  id    String @id @default(cuid())
+  name  String @unique
+  order Int    @default(0)
+  items MarketItem[]
+}
+
+enum ListingStatus { PENDING APPROVED REJECTED }
+
+model MarketItem {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields:[userId],references:[id])
+  categoryId  String
+  category    MarketCategory @relation(fields:[categoryId],references:[id])
+  title       String
+  description String
+  priceCents  Int?     // опціонально
+  contact     String?  // Discord/Telegram
+  photos      Json     // масив URLів
+  status      ListingStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+}
+
+model LawyerProfile {
+  id        String  @id @default(cuid())
+  userId    String  @unique
+  user      User    @relation(fields:[userId],references:[id])
+  licenseNo String?
+  licenseAt DateTime?
+  bio       String?
+  active    Boolean @default(true)
+  createdAt DateTime @default(now())
+}
+
+enum ContractStatus { PENDING ACTIVE EXPIRED REJECTED }
+
+model Contract {
+  id          String   @id @default(cuid())
+  userId      String   // клієнт
+  user        User     @relation("ClientContracts", fields:[userId], references:[id])
+  lawyerId    String   // адвокат (userId)
+  lawyer      User     @relation("LawyerContracts", fields:[lawyerId], references:[id])
+  title       String
+  body        String
+  status      ContractStatus @default(PENDING)
+  activeUntil DateTime?
+  fileUrl     String?        // PDF-копія для перегляду
+  reviewerId  String?        // хто затвердив
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model LawyerApplication {
+  id        String  @id @default(cuid())
+  userId    String  @unique
+  user      User    @relation(fields:[userId],references:[id])
+  fullName  String
+  licenseNo String?
+  message   String?
+  status    ListingStatus @default(PENDING)
+  createdAt DateTime @default(now())
+}
+
+model TransportCompany {
+  id        String  @id @default(cuid())
+  ownerId   String
+  owner     User    @relation(fields:[ownerId],references:[id])
+  name      String
+  about     String?
+  bonuses   String?
+  members   Int      @default(1)
+  createdAt DateTime @default(now())
+  trucks    Truck[]
+}
+
+enum VehicleStatus { AVAILABLE BOOKED RENTED MAINTENANCE }
+
+model Truck {
+  id          String  @id @default(cuid())
+  companyId   String
+  company     TransportCompany @relation(fields:[companyId],references:[id])
+  title       String
+  description String?
+  photoUrl    String?
+  docUrl      String?
+  status      VehicleStatus @default(AVAILABLE)
+  pricePerDayCents Int @default(0)
+  createdAt   DateTime @default(now())
+  bookings    Booking[]
+}
+
+model Booking {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User @relation(fields:[userId],references:[id])
+  truckId   String
+  truck     Truck @relation(fields:[truckId],references:[id])
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
 }
