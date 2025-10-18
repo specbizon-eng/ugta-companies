@@ -7,10 +7,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role { CLIENT STAFF ADMIN MOD }
-enum ContractStatus { PENDING ACTIVE EXPIRED REJECTED }
-enum VehicleStatus { AVAILABLE BOOKED RENTED MAINTENANCE }
-enum ChatPenalty  { NONE MUTE BAN }
+enum Role {
+  CLIENT
+  STAFF
+  ADMIN
+  MOD
+}
+
+enum ContractStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  REJECTED
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  BOOKED
+  RENTED
+  MAINTENANCE
+}
+
+enum ChatPenalty  {
+  NONE
+  MUTE
+  BAN
+}
 
 model User {
   id            String   @id @default(cuid())
