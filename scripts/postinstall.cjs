@@ -6,15 +6,19 @@ function run(cmd) {
 }
 
 try {
-  // Використовуємо npx (працює і з npm, і з pnpm, і з yarn)
+  // 1) згенерувати клієнт
   run("npx prisma generate");
 
   if (process.env.DATABASE_URL) {
-    console.log("DATABASE_URL found → migrate deploy + seed");
-    run("npx prisma migrate deploy");
+    console.log("DATABASE_URL found → db push + seed");
+
+    // 2) створити таблиці в БД за схемою (без файлів міграцій)
+    run("npx prisma db push");
+
+    // 3) засіяти адміна
     run("node prisma/seed.cjs");
   } else {
-    console.log("DATABASE_URL not set → skipping migrate/seed");
+    console.log("DATABASE_URL not set → skipping db push/seed");
   }
 } catch (e) {
   console.error("postinstall failed:", e?.message || e);
