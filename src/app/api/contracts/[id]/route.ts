@@ -2,18 +2,18 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getUserFromCookie } from "@/lib/auth";
 
-function getIdFromUrl(req) {
+function getIdFromUrl(req: Request): string | null {
   try {
     const url = new URL(req.url);
     const parts = url.pathname.split("/").filter(Boolean);
     // /api/contracts/[id] → ["api","contracts","<id>"]
-    return parts[2] || null;
+    return (parts[2] as string) || null;
   } catch {
     return null;
   }
 }
 
-export async function PATCH(req) {
+export async function PATCH(req: Request) {
   const me = await getUserFromCookie();
   if (!me || (me.role !== "STAFF" && me.role !== "ADMIN")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
