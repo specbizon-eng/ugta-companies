@@ -1,4 +1,0 @@
-
-import { NextResponse } from "next/server"; import { prisma } from "@/lib/db"; import { getUserFromCookie } from "@/lib/auth";
-export async function GET(){ const me=await getUserFromCookie(); if(!me) return NextResponse.json({error:'Unauthorized'},{status:401}); if(me.role==='CLIENT'){ const list=await prisma.contract.findMany({where:{userId:me.id},orderBy:{createdAt:'desc'}}); return NextResponse.json(list); } const list=await prisma.contract.findMany({orderBy:{createdAt:'desc'}}); return NextResponse.json(list); }
-export async function POST(req:Request){ const me=await getUserFromCookie(); if(!me) return NextResponse.json({error:'Unauthorized'},{status:401}); const {title,body,fileUrl}=await req.json(); const c=await prisma.contract.create({data:{userId:me.id,title:title||'Договір',body:body||'',fileUrl,status:'PENDING'}}); return NextResponse.json(c); }

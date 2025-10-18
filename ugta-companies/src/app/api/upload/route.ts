@@ -1,3 +1,0 @@
-
-import { NextResponse } from "next/server"; import { promises as fs } from "fs"; import path from "path"; import crypto from "crypto";
-export async function POST(req:Request){ const form=await req.formData(); const file=form.get('file') as File | null; if(!file) return NextResponse.json({error:'No file'},{status:400}); const bytes=await file.arrayBuffer(); const buffer=Buffer.from(bytes); const ext=path.extname((file as any).name || '.pdf') || '.pdf'; const name=crypto.randomBytes(8).toString('hex')+ext; const dir=path.join(process.cwd(),'public','uploads'); await fs.mkdir(dir,{recursive:true}); const filepath=path.join(dir,name); await fs.writeFile(filepath,buffer); const url='/uploads/'+name; return NextResponse.json({url}); }
