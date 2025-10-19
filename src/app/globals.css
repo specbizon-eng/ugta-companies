@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html, body, :root { height: 100%; }
+body { background: theme(colors.bg.DEFAULT); color: theme(colors.text.primary); }
+
+.container {
+  @apply mx-auto w-full max-w-7xl px-4 md:px-6 lg:px-8;
+}
+.btn {
+  @apply inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold transition;
+}
+.btn-accent {
+  @apply btn bg-accent text-white shadow-glow hover:bg-accent-hover focus:outline-none focus:ring-4 focus:ring-[color:var(--ring)];
+}
