@@ -1,21 +1,49 @@
-// src/components/AuthModal.tsx
 "use client";
-import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import clsx from "clsx";
 
-export default function AuthModal({open,onClose}:{open:boolean; onClose:()=>void}) {
-  if(!open) return null;
+const nav = [
+  { href: "/", label: "Головна" },
+  { href: "/chat", label: "Чат" },
+  { href: "/market", label: "Маркет" },
+  { href: "/legal", label: "Юридична" },
+  { href: "/trucks", label: "Вантажівки" },
+];
+
+export function Header() {
+  const pathname = usePathname();
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="w-[480px] rounded-xl bg-slate-900 p-6 shadow-xl">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-xl font-semibold">Увійти або зареєструватись</h3>
-          <button onClick={onClose} className="opacity-70 hover:opacity-100">✕</button>
-        </div>
-        <div className="grid gap-3">
-          <a href="/auth/login" className="rounded-lg border border-slate-700 px-4 py-3 text-center hover:bg-slate-800">Вхід</a>
-          <a href="/auth/register" className="rounded-lg border border-slate-700 px-4 py-3 text-center hover:bg-slate-800">Реєстрація</a>
+    <header className="sticky top-0 z-40 w-full border-b border-outline/40 bg-bg/80 backdrop-blur">
+      <div className="container h-14 flex items-center justify-between">
+        <Link href="/" className="font-semibold tracking-wide">
+          01 CENTRAL UKRAINE | U-GTA
+        </Link>
+        <nav className="hidden md:flex gap-4">
+          {nav.map((i) => (
+            <Link
+              key={i.href}
+              href={i.href}
+              className={clsx(
+                "px-3 py-1.5 rounded-lg text-sm transition",
+                pathname === i.href
+                  ? "bg-outline/40"
+                  : "hover:bg-outline/30 text-text-muted"
+              )}
+            >
+              {i.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="flex gap-2">
+          <Link href="/auth/login" className="px-3 py-1.5 rounded-lg text-sm bg-outline/40 hover:bg-outline/60">
+            Вхід
+          </Link>
+          <Link href="/auth/register" className="px-3 py-1.5 rounded-lg text-sm bg-accent text-white hover:bg-accent-hover">
+            Реєстрація
+          </Link>
         </div>
       </div>
-    </div>
+    </header>
   );
 }
