@@ -14,7 +14,7 @@ export default function Page() {
           {/* Зліва — текст */}
           <div className="lg:w-1/2">
             <h1 className="text-4xl lg:text-6xl font-extrabold text-white mb-6">
-              ОНЛАЙН СЕРВІС <br /> ДЛЯ БІЗНЕСУ ТА RP
+              ОНЛАЙН СЕРВІС <br /> ДЛЯ БІЗНЕСУ ТА ТОРГОВЛІ
             </h1>
             <p className="text-gray-400 mb-8">
               Юридичні послуги, договори, статуси. <br />
