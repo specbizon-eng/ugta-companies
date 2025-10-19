@@ -1,8 +1,19 @@
-
 import type { Metadata } from "next";
 import "./globals.css";
-import ClientHeader from "@/components/ClientHeader";
-export const metadata: Metadata = { title: "01 CENTRAL UKRAINE | U-GTA — Компанії", description: "Юридичні послуги та оренда вантажівок" };
-export default function RootLayout({ children }: { children: React.ReactNode }){
-  return (<html lang="uk"><body className="min-h-screen bg-slate-950 text-slate-100 antialiased"><ClientHeader /><main className="max-w-6xl mx-auto px-6 py-8">{children}</main></body></html>);
+import { Header } from "@/components/Header";
+
+export const metadata: Metadata = {
+  title: "01 CENTRAL UKRAINE | U-GTA",
+  description: "Онлайн Площадка для Торговлі та сервіс для бізнесу і Юридичних послуг",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="uk">
+      <body className="min-h-[100dvh] bg-bg text-text-primary antialiased">
+        <Header />
+        {children}
+      </body>
+    </html>
+  );
 }
