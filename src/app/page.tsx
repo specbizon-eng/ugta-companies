@@ -1,5 +1,48 @@
-
+import Image from "next/image";
 import Link from "next/link";
-export default function Home(){
-  return (<main className="min-h-screen bg-[#0c0f15] text-slate-100"><section className="relative overflow-hidden"><div className="relative max-w-6xl mx-auto px-6 py-16"><div className="flex flex-col lg:flex-row items-center gap-10"><div className="flex-1"><span className="inline-flex items-center gap-2 rounded-full bg-slate-900/70 px-3 py-1 text-xs border border-slate-800">01 CENTRAL UKRAINE | U-GTA</span><h1 className="mt-4 text-4xl sm:text-5xl font-extrabold">ОНЛАЙН СЕРВІС<br/>ДЛЯ БІЗНЕСУ ТА RP</h1><p className="mt-4 text-slate-300 max-w-xl">Юридичні послуги, договори, статуси. Оренда вантажівок із бронюванням.</p><div className="mt-8 flex flex-wrap gap-3"><Link href="/auth/register" className="px-5 py-3 rounded-xl bg-rose-500 hover:bg-rose-600">Розпочати</Link><Link href="/dashboard" className="px-5 py-3 rounded-xl bg-slate-800 border border-slate-700">Кабінет</Link><Link href="/legal" className="px-5 py-3 rounded-xl border border-slate-700">Юридична</Link><Link href="/trucks" className="px-5 py-3 rounded-xl border border-slate-700">Вантажівки</Link></div></div><div className="flex-1"><div className="aspect-[4/3] rounded-2xl border border-slate-800 bg-slate-900/50" /></div></div></div></section></main>);
+
+export default function Home() {
+  return (
+    <main className="relative">
+      {/* hero */}
+      <section className="relative">
+        {/* фон: своя картинка у /public/hero.jpg (без копіювання з чужого сайту) */}
+        <div className="absolute inset-0">
+          <Image
+            src="/hero.jpg"
+            alt="UGTA cover"
+            fill
+            priority
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-bg" />
+        </div>
+
+        <div className="container relative z-10 flex min-h-[calc(100dvh-56px)] flex-col justify-center">
+          <span className="inline-block text-xs tracking-widest text-text-muted mb-4">
+            01 CENTRAL UKRAINE | U-GTA
+          </span>
+
+          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight max-w-3xl">
+            ОНЛАЙН СЕРВІС
+            <br />
+            ДЛЯ БІЗНЕСУ ТА RP
+          </h1>
+
+          <p className="mt-4 max-w-2xl text-text-muted">
+            Юридичні послуги, договори, статуси. Оренда вантажівок із бронюванням.
+          </p>
+
+          <div className="mt-8">
+            <Link href="/auth/login" className="btn-accent">
+              Розпочати
+            </Link>
+          </div>
+
+          {/* місце під майбутній прев’ю/слайдер праворуч (порожній блок) */}
+          <div className="mt-10 h-64 rounded-2xl border border-outline/40 bg-bg/60" />
+        </div>
+      </section>
+    </main>
+  );
 }
