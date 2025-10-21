@@ -1,15 +1,13 @@
-// ---------- Prisma Client ----------
 generator client {
   provider = "prisma-client-js"
 }
 
-// ---------- Datasource ----------
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// ---------- Enums ----------
+/* ==================== ENUMS (по одному) ==================== */
 enum Role {
   CLIENT
   STAFF
@@ -43,7 +41,7 @@ enum VehicleStatus {
   MAINTENANCE
 }
 
-// ---------- Core Models ----------
+/* ==================== CORE ==================== */
 model User {
   id            String   @id @default(cuid())
   email         String   @unique
@@ -55,6 +53,7 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  // зв'язки
   clientContracts Contract[] @relation("ClientContracts")
   lawyerContracts Contract[] @relation("LawyerContracts")
   bookings        Booking[]
@@ -62,6 +61,32 @@ model User {
   lawyerProfile   LawyerProfile?
   lawyerApp       LawyerApplication?
   companiesOwned  TransportCompany[] @relation("CompanyOwner")
+}
+
+/* ==================== LEGAL ==================== */
+model Contract {
+  id          String         @id @default(cuid())
+
+  // клієнт
+  userId      String
+  user        User           @relation("ClientContracts", fields: [userId], references: [id])
+
+  // адвокат
+  lawyerId    String
+  lawyer      User           @relation("LawyerContracts", fields: [lawyerId], references: [id])
+
+  title       String
+  body        String
+  status      ContractStatus @default(PENDING)
+  activeUntil DateTime?
+  fileUrl     String?
+  reviewerId  String?
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([lawyerId])
 }
 
 model BalanceLedger {
@@ -85,7 +110,6 @@ model ChatModeration {
   createdAt DateTime    @default(now())
 }
 
-// ---------- Legal ----------
 model LawyerProfile {
   id        String   @id @default(cuid())
   userId    String   @unique
@@ -108,30 +132,7 @@ model LawyerApplication {
   createdAt DateTime      @default(now())
 }
 
-model Contract {
-  id          String         @id @default(cuid())
-
-  userId      String
-  user        User           @relation("ClientContracts", fields: [userId], references: [id])
-
-  lawyerId    String
-  lawyer      User           @relation("LawyerContracts", fields: [lawyerId], references: [id])
-
-  title       String
-  body        String
-  status      ContractStatus @default(PENDING)
-  activeUntil DateTime?
-  fileUrl     String?
-  reviewerId  String?
-
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-
-  @@index([userId])
-  @@index([lawyerId])
-}
-
-// ---------- Market ----------
+/* ==================== MARKET ==================== */
 model MarketCategory {
   id        String   @id @default(cuid())
   name      String   @unique
@@ -153,7 +154,7 @@ model MarketItem {
   title       String
   description String
   priceCents  Int?
-  contact     String?        // Discord / Telegram
+  contact     String?        // Discord/Telegram
   photos      Json           // масив URLів
   status      ListingStatus  @default(PENDING)
 
@@ -163,25 +164,24 @@ model MarketItem {
   @@index([categoryId])
 }
 
-// ---------- Transport / Trucks ----------
+/* ==================== TRANSPORT ==================== */
 model TransportCompany {
-  id          String   @id @default(cuid())
-  ownerUserId String
-  owner       User     @relation("CompanyOwner", fields: [ownerUserId], references: [id])
-  name        String
-  garageInfo  String?
-  bonuses     String?
-  members     Int      @default(0)
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  ownerId   String
+  owner     User     @relation("CompanyOwner", fields: [ownerId], references: [id])
+  name      String
+  about     String?
+  bonuses   String?
+  members   Int      @default(1)
+  createdAt DateTime @default(now())
 
-  trucks      Truck[]
+  trucks    Truck[]
 
-  @@index([ownerUserId])
+  @@index([ownerId])
 }
 
 model Truck {
   id               String           @id @default(cuid())
-
   companyId        String
   company          TransportCompany @relation(fields: [companyId], references: [id])
 
@@ -201,16 +201,16 @@ model Truck {
 model Booking {
   id        String   @id @default(cuid())
 
-  truckId   String
-  truck     Truck    @relation(fields: [truckId], references: [id])
-
   userId    String
   user      User     @relation(fields: [userId], references: [id])
 
-  from      DateTime
-  to        DateTime
+  truckId   String
+  truck     Truck    @relation(fields: [truckId], references: [id])
+
+  startDate DateTime
+  endDate   DateTime
   createdAt DateTime @default(now())
 
-  @@index([truckId])
   @@index([userId])
+  @@index([truckId])
 }
