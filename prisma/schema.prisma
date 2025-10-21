@@ -9,7 +9,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ---------- Enums (один раз кожен) ----------
+// ---------- Enums ----------
 enum Role {
   CLIENT
   STAFF
@@ -55,7 +55,6 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  // зв’язки
   clientContracts Contract[] @relation("ClientContracts")
   lawyerContracts Contract[] @relation("LawyerContracts")
   bookings        Booking[]
@@ -112,11 +111,9 @@ model LawyerApplication {
 model Contract {
   id          String         @id @default(cuid())
 
-  // клієнт
   userId      String
   user        User           @relation("ClientContracts", fields: [userId], references: [id])
 
-  // адвокат
   lawyerId    String
   lawyer      User           @relation("LawyerContracts", fields: [lawyerId], references: [id])
 
@@ -124,8 +121,8 @@ model Contract {
   body        String
   status      ContractStatus @default(PENDING)
   activeUntil DateTime?
-  fileUrl     String?        // посилання на PDF
-  reviewerId  String?        // хто затвердив
+  fileUrl     String?
+  reviewerId  String?
 
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
@@ -191,7 +188,7 @@ model Truck {
   title            String
   description      String?
   photoUrl         String?
-  docUrl           String?          // техпаспорт
+  docUrl           String?
   status           VehicleStatus    @default(AVAILABLE)
   pricePerDayCents Int              @default(0)
 
