@@ -13,8 +13,8 @@ export default function Hero({ onStart }: Props) {
       {/* Зображення */}
       <div className="relative aspect-[16/7] w-full overflow-hidden rounded-3xl bg-gradient-to-b from-slate-900/10 to-slate-900/40 ring-1 ring-white/5">
         <Image
-          src="/images/hero/hero-team.png"
-          alt="UGTA — сервіс для бізнесу та RP"
+          src="/public/images/hero/hero-team.png"
+          alt="UGTA — сервіс для бізнесу"
           fill
           priority
           sizes="100vw"
