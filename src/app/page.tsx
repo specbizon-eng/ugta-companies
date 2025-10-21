@@ -20,7 +20,7 @@ export default function Home() {
 
             <h1 className="mt-4 text-4xl/tight font-extrabold tracking-tight md:text-5xl lg:text-6xl">
               ОНЛАЙН СЕРВІС
-              <br /> ДЛЯ БІЗНЕСУ
+              <br /> ДЛЯ БІЗНЕСУ ТА ТОРГОВЛІ
             </h1>
 
             <p className="mt-4 max-w-xl text-base text-foreground/70">
