@@ -62,7 +62,7 @@ export default function Home() {
           {/* Права колонка: картинка героїв */}
           <div className="relative w-full aspect-[16/10]">
             <Image
-              src="/public/images/hero/hero.png"
+              src="/images/hero/hero.png"
               alt="UGTA герої"
               fill
               priority
