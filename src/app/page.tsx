@@ -35,27 +35,6 @@ export default function Home() {
               >
                 Розпочати
               </Link>
-
-              <Link
-                href="/dashboard"
-                className="rounded-md border border-border px-5 py-2.5 text-foreground/90 hover:bg-muted/30"
-              >
-                Кабінет
-              </Link>
-
-              <Link
-                href="/legal"
-                className="rounded-md border border-border px-5 py-2.5 text-foreground/90 hover:bg-muted/30"
-              >
-                Юридична
-              </Link>
-
-              <Link
-                href="/trucks"
-                className="rounded-md border border-border px-5 py-2.5 text-foreground/90 hover:bg-muted/30"
-              >
-                Вантажівки
-              </Link>
             </div>
           </div>
 
