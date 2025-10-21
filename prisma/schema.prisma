@@ -1,31 +1,20 @@
+// ---------- Prisma Client ----------
 generator client {
   provider = "prisma-client-js"
 }
 
+// ---------- Datasource ----------
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+// ---------- Enums (один раз кожен) ----------
 enum Role {
   CLIENT
   STAFF
   ADMIN
   MOD
-}
-
-enum ContractStatus {
-  PENDING
-  ACTIVE
-  EXPIRED
-  REJECTED
-}
-
-enum VehicleStatus {
-  AVAILABLE
-  BOOKED
-  RENTED
-  MAINTENANCE
 }
 
 enum ChatPenalty  {
@@ -34,6 +23,27 @@ enum ChatPenalty  {
   BAN
 }
 
+enum ListingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ContractStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  RESERVED
+  RENTED
+  MAINTENANCE
+}
+
+// ---------- Core Models ----------
 model User {
   id            String   @id @default(cuid())
   email         String   @unique
@@ -45,173 +55,165 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  contracts     Contract[]
-  bookings      Booking[]
-
-  // ✅ зворотній зв’язок до BalanceLedger
-  ledgerEntries BalanceLedger[] @relation("UserToLedger")
-}
-
-model Contract {
-  id          String          @id @default(cuid())
-  userId      String
-  user        User            @relation(fields: [userId], references: [id])
-  title       String
-  body        String
-  status      ContractStatus  @default(PENDING)
-  activeUntil DateTime?
-  fileUrl     String?
-  reviewerId  String?
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-}
-
-model Vehicle {
-  id               String         @id @default(cuid())
-  title            String
-  description      String
-  photoUrl         String?
-  docUrl           String?
-  status           VehicleStatus  @default(AVAILABLE)
-  pricePerDayCents Int            @default(0)
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-
-  bookings         Booking[]
-}
-
-model Booking {
-  id         String   @id @default(cuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
-  vehicleId  String
-  vehicle    Vehicle  @relation(fields: [vehicleId], references: [id])
-  startDate  DateTime
-  endDate    DateTime
-  createdAt  DateTime @default(now())
+  // зв’язки
+  clientContracts Contract[] @relation("ClientContracts")
+  lawyerContracts Contract[] @relation("LawyerContracts")
+  bookings        Booking[]
+  ledgerEntries   BalanceLedger[] @relation("UserToLedger")
+  lawyerProfile   LawyerProfile?
+  lawyerApp       LawyerApplication?
+  companiesOwned  TransportCompany[] @relation("CompanyOwner")
 }
 
 model BalanceLedger {
   id         String   @id @default(cuid())
   userId     String
-
-  // ✅ явна назва зв’язку
   user       User     @relation("UserToLedger", fields: [userId], references: [id])
-
   deltaCents Int
   note       String
   createdAt  DateTime @default(now())
+
+  @@index([userId])
 }
 
 model ChatModeration {
-  id        String       @id @default(cuid())
+  id        String      @id @default(cuid())
   targetId  String?
   ipHash    String?
-  penalty   ChatPenalty  @default(NONE)
+  penalty   ChatPenalty @default(NONE)
   reason    String?
   expiresAt DateTime?
-  createdAt DateTime     @default(now())
+  createdAt DateTime    @default(now())
 }
 
-model MarketCategory {
-  id    String @id @default(cuid())
-  name  String @unique
-  order Int    @default(0)
-  items MarketItem[]
-}
-
-enum ListingStatus { PENDING APPROVED REJECTED }
-
-model MarketItem {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields:[userId],references:[id])
-  categoryId  String
-  category    MarketCategory @relation(fields:[categoryId],references:[id])
-  title       String
-  description String
-  priceCents  Int?     // опціонально
-  contact     String?  // Discord/Telegram
-  photos      Json     // масив URLів
-  status      ListingStatus @default(PENDING)
-  createdAt   DateTime @default(now())
-}
-
+// ---------- Legal ----------
 model LawyerProfile {
-  id        String  @id @default(cuid())
-  userId    String  @unique
-  user      User    @relation(fields:[userId],references:[id])
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
   licenseNo String?
   licenseAt DateTime?
   bio       String?
-  active    Boolean @default(true)
+  active    Boolean  @default(true)
   createdAt DateTime @default(now())
 }
 
-enum ContractStatus { PENDING ACTIVE EXPIRED REJECTED }
-
-model Contract {
-  id          String   @id @default(cuid())
-  userId      String   // клієнт
-  user        User     @relation("ClientContracts", fields:[userId], references:[id])
-  lawyerId    String   // адвокат (userId)
-  lawyer      User     @relation("LawyerContracts", fields:[lawyerId], references:[id])
-  title       String
-  body        String
-  status      ContractStatus @default(PENDING)
-  activeUntil DateTime?
-  fileUrl     String?        // PDF-копія для перегляду
-  reviewerId  String?        // хто затвердив
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
 model LawyerApplication {
-  id        String  @id @default(cuid())
-  userId    String  @unique
-  user      User    @relation(fields:[userId],references:[id])
+  id        String        @id @default(cuid())
+  userId    String        @unique
+  user      User          @relation(fields: [userId], references: [id])
   fullName  String
   licenseNo String?
   message   String?
   status    ListingStatus @default(PENDING)
-  createdAt DateTime @default(now())
+  createdAt DateTime      @default(now())
 }
 
+model Contract {
+  id          String         @id @default(cuid())
+
+  // клієнт
+  userId      String
+  user        User           @relation("ClientContracts", fields: [userId], references: [id])
+
+  // адвокат
+  lawyerId    String
+  lawyer      User           @relation("LawyerContracts", fields: [lawyerId], references: [id])
+
+  title       String
+  body        String
+  status      ContractStatus @default(PENDING)
+  activeUntil DateTime?
+  fileUrl     String?        // посилання на PDF
+  reviewerId  String?        // хто затвердив
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([lawyerId])
+}
+
+// ---------- Market ----------
+model MarketCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  items     MarketItem[]
+}
+
+model MarketItem {
+  id          String         @id @default(cuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id])
+
+  categoryId  String
+  category    MarketCategory @relation(fields: [categoryId], references: [id])
+
+  title       String
+  description String
+  priceCents  Int?
+  contact     String?        // Discord / Telegram
+  photos      Json           // масив URLів
+  status      ListingStatus  @default(PENDING)
+
+  createdAt   DateTime       @default(now())
+
+  @@index([userId])
+  @@index([categoryId])
+}
+
+// ---------- Transport / Trucks ----------
 model TransportCompany {
-  id        String  @id @default(cuid())
-  ownerId   String
-  owner     User    @relation(fields:[ownerId],references:[id])
-  name      String
-  about     String?
-  bonuses   String?
-  members   Int      @default(1)
-  createdAt DateTime @default(now())
-  trucks    Truck[]
-}
+  id          String   @id @default(cuid())
+  ownerUserId String
+  owner       User     @relation("CompanyOwner", fields: [ownerUserId], references: [id])
+  name        String
+  garageInfo  String?
+  bonuses     String?
+  members     Int      @default(0)
+  createdAt   DateTime @default(now())
 
-enum VehicleStatus { AVAILABLE BOOKED RENTED MAINTENANCE }
+  trucks      Truck[]
+
+  @@index([ownerUserId])
+}
 
 model Truck {
-  id          String  @id @default(cuid())
-  companyId   String
-  company     TransportCompany @relation(fields:[companyId],references:[id])
-  title       String
-  description String?
-  photoUrl    String?
-  docUrl      String?
-  status      VehicleStatus @default(AVAILABLE)
-  pricePerDayCents Int @default(0)
-  createdAt   DateTime @default(now())
-  bookings    Booking[]
+  id               String           @id @default(cuid())
+
+  companyId        String
+  company          TransportCompany @relation(fields: [companyId], references: [id])
+
+  title            String
+  description      String?
+  photoUrl         String?
+  docUrl           String?          // техпаспорт
+  status           VehicleStatus    @default(AVAILABLE)
+  pricePerDayCents Int              @default(0)
+
+  createdAt        DateTime         @default(now())
+  bookings         Booking[]
+
+  @@index([companyId])
 }
 
 model Booking {
-  id        String  @id @default(cuid())
-  userId    String
-  user      User @relation(fields:[userId],references:[id])
+  id        String   @id @default(cuid())
+
   truckId   String
-  truck     Truck @relation(fields:[truckId],references:[id])
-  startDate DateTime
-  endDate   DateTime
+  truck     Truck    @relation(fields: [truckId], references: [id])
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  from      DateTime
+  to        DateTime
   createdAt DateTime @default(now())
+
+  @@index([truckId])
+  @@index([userId])
 }
